@@ -1,0 +1,19 @@
+-- Active: 1665131827383@@127.0.0.1@3306@northwind
+
+
+--1 - Liste des contacts français :
+select CompanyName societe, ContactName contact, ContactTitle fonction, Phone telephone From customers 
+WHERE Country = 'France';
+
+--2 - Produits vendus par le fournisseur « Exotic Liquids » :
+SELECT ProductName produit,UnitPrice prix from suppliers s
+JOIN products p ON p.SupplierID=s.SupplierID
+;
+
+--3 - Nombre de produits vendus par les fournisseurs Français dans l’ordre décroissant :
+SELECT CompanyName fournisseur,COUNT(*) AS 'nbre produits' FROM suppliers s 
+JOIN products p ON p.SupplierID=s.SupplierID
+WHERE Country ='France'
+GROUP BY fournisseur
+ORDER BY COUNT(*) DESC
+;

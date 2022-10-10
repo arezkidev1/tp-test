@@ -1,0 +1,22 @@
+-- Active: 1665131827383@@127.0.0.1@3306@papyrus
+
+--Créez la procédure stockée Lst_fournis correspondant à la requête n°2 afficher le code des fournisseurs pour lesquels une commande a été passée.
+DROP PROCEDURE lst_fournis;
+DELIMITER |
+
+CREATE PROCEDURE lst_fournis()
+
+BEGIN
+  SELECT DISTINCT fournis.numfou, nomfou FROM entcom
+  JOIN fournis ON entcom.numfou = fournis.numfou;
+END |
+
+
+DELIMITER ;
+
+SHOW CREATE PROCEDURE lst_fournis;
+
+CALL lst_fournis;
+
+SHOW PROCEDURE STATUS;
+

@@ -1,0 +1,41 @@
+-- Active: 1665131827383@@127.0.0.1@3306@papyrus
+
+
+-- Exercice 2 : vues sur la base papyrus
+
+/*  1 - v_GlobalCde correspondant à la requête : 
+A partir de la table Ligcom, afficher par code produit, la somme des quantités commandées et le prix total correspondant : 
+on nommera la colonne correspondant à la somme des quantités commandées, QteTot et le prix total, PrixTot. */
+
+CREATE VIEW v_globalcde 
+AS 
+SELECT p.codart, SUM(qtecde) AS qtetot , SUM(qtecde*priuni) AS prixtot FROM ligcom l
+JOIN produit p ON p.codart=l.codart 
+--WHERE p.codart=l.codart
+GROUP BY p.codart
+;
+
+SELECT codart , qtetot , prixtot FROM v_globalcde;
+
+/* 2- v_VentesI100 correspondant à la requête : Afficher les ventes dont le code produit est le I100 (affichage de toutes les colonnes de la table Vente).*/
+
+CREATE VIEW v_ventesI100
+AS 
+SELECT qte1 , prix1 , qte2 , prix2 , qte3, prix3 , p.codart , p.libart FROM vente v 
+JOIN produit p ON p.codart=v.codart 
+WHERE p.codart='I100'
+;
+
+SELECT qte1 , prix1 , qte2 , prix2 , qte3, prix3 ,codart FROM v_ventesI100 ;
+
+--A partir de la vue précédente, créez v_VentesI100Grobrigan remontant toutes les ventes concernant le produit I100 et le fournisseur 00120. 
+
+CREATE VIEW v_ventesI100grobrigan
+AS 
+SELECT qte1 , prix1 , qte2 , prix2 , qte3, prix3 , p.codart , f.numfou FROM vente v 
+JOIN produit p ON p.codart = v.codart 
+JOIN fournis f ON v.numfou = f.numfou
+WHERE (p.codart = 'I100' AND f.numfou = '00120')
+;
+
+SELECT qte1 , prix1 , qte2 , prix2 , qte3, prix3 ,codart , numfou FROM v_ventesI100grobrigan ;

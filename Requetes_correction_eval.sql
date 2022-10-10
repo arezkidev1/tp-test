@@ -1,3 +1,4 @@
+-- Active: 1665131827383@@127.0.0.1@3306@northwind
 -- La base Northwind
 -- Utilisez le script complet northwind_mysql.sql pour créer la base de données Northwind correspondant au schéma de BDD suivant :
 -- MCD Northwind
@@ -21,11 +22,13 @@
 
 -- 3- Nombre de produits mis à disposition par les fournisseurs français (tri par nombre de produits décroissant) :
 
-	SELECT CompanyName AS Fournisseur, UnitsInStock AS nb_products
+	SELECT products.SupplierID, CompanyName AS Fournisseur , SUM(UnitsInStock) AS nb_products
 	FROM suppliers
     JOIN products ON suppliers.SupplierID = products.SupplierID
     WHERE Country = 'France'
-	ORDER BY nb_products DESC;
+    GROUP BY Fournisseur
+	ORDER BY nb_products DESC
+    ;
 
 -- 4- Liste des clients français ayant passé plus de 10 commandes :
 

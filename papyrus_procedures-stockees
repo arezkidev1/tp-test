@@ -47,3 +47,29 @@ SHOW CREATE PROCEDURE lst_commandes ;
 
 
 ----------------- Exercice 3 : création d'une procédure stockée avec plusieurs paramètres ------------
+
+/*Créer la procédure stockée CA_ Fournisseur, qui pour un code fournisseur et une année entrée en paramètre, 
+calcule et restitue le CA potentiel de ce fournisseur pour l'année souhaitée (cette requête sera construite à partir de la requête n°19).
+
+On exécutera la requête que si le code fournisseur est valide, c'est-à-dire dans la table FOURNIS.
+Testez cette procédure avec différentes valeurs des paramètres. */
+
+DROP PROCEDURE ca_fournisseur ;
+
+DELIMITER |
+
+CREATE PROCEDURE ca_fournisseur()
+BEGIN 
+    SELECT (((prix1*qte1) + (prix2*qte2) + (prix3*qte3))*1.2) AS chiffre_affaire, nomfou , datecom
+FROM vente 
+JOIN fournis ON vente.numfou = fournis.numfou
+JOIN entcom ON entcom.numfou = fournis.numfou
+WHERE datecom LIKE '2007%'
+GROUP BY nomfou;
+END |
+
+DELIMITER;
+
+SHOW CREATE PROCEDURE ca_fournisseur ;
+
+SHOW PROCEDURE STATUS;

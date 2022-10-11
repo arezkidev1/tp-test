@@ -1,5 +1,7 @@
 -- Active: 1665131827383@@127.0.0.1@3306@papyrus
 
+---------------  Exercice 1 : création d'une procédure stockée sans paramètre ------------------
+
 --Créez la procédure stockée Lst_fournis correspondant à la requête n°2 afficher le code des fournisseurs pour lesquels une commande a été passée.
 DROP PROCEDURE lst_fournis;
 DELIMITER |
@@ -20,3 +22,28 @@ CALL lst_fournis;
 
 SHOW PROCEDURE STATUS;
 
+
+--------------------  Exercice 2 : création d'une procédure stockée avec un paramètre en entrée  ------------------
+
+
+DROP PROCEDURE lst_commandes;
+
+DELIMITER |
+
+CREATE PROCEDURE lst_commandes()
+BEGIN 
+    select e.numcom, f.nomfou, p.libart, l.qtecde*l.priuni
+    from ligcom l
+    join produit p on p.codart=l.codart
+    join entcom e on e.numcom=l.numcom
+    join fournis f on f.numfou=e.numfou
+where e.obscom like '%urgent%'
+GROUP BY numcom; 
+END |
+
+DELIMITER;
+
+SHOW CREATE PROCEDURE lst_commandes ;
+
+
+----------------- Exercice 3 : création d'une procédure stockée avec plusieurs paramètres ------------

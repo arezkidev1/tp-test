@@ -1,4 +1,4 @@
--- Active: 1664351913126@@127.0.0.1@3306@papyrus
+-- Active: 1665131827383@@127.0.0.1@3306@papyrus
 -- 1. Quelles sont les commandes du fournisseur 09120 ?
 
 select * 
@@ -131,7 +131,8 @@ from ligcom l
 join produit p on p.codart=l.codart
 join entcom e on e.numcom=l.numcom
 join fournis f on f.numfou=e.numfou
-where e.obscom like '%urgent%'; 
+where e.obscom like '%urgent%'
+GROUP BY numcom; 
 
 
 
@@ -162,3 +163,95 @@ select nomfou from fournis where numfou in (
 Lister les commandes (Numéro et date) dont le fournisseur est celui de
 la commande 70210 : */
 
+-- ajout tom---
+
+
+SELECT numcom , datcom 
+FROM entcom 
+WHERE NUMCOM = 70210;
+
+SELECT numcom , datcom 
+FROM entcom
+GROUP BY NUMCOM 
+HAVING NUMCOM = 70210; 
+
+
+/*14. Dans les articles susceptibles d’être vendus, lister les articles moins
+chers (basés sur Prix1) que le moins cher des rubans (article dont le
+premier caractère commence par R). On affichera le libellé de l’article
+et prix1 */
+
+SELECT DISTINCT PRIX1 , LIBART
+FROM produit
+JOIN vente ON produit.CODART = vente.CODART         --Marche sur heidi mais pas vscode
+WHERE prix1 < (
+    SELECT MIN(prix1)
+    FROM vente
+    WHERE CODART LIKE "R%"
+);
+
+/*15. Editer la liste des fournisseurs susceptibles de livrer les produits
+dont le stock est inférieur ou égal à 150 % du stock d'alerte. La liste est
+triée par produit puis fournisseur */
+
+SELECT DISTINCT NOMFOU ,LIBART
+FROM fournis
+JOIN vente ON fournis.numfou = vente.numfou
+JOIN produit ON vente.CODART = produit.CODART
+WHERE STKPHY <= ( 
+    SELECT SUM(STKALE)*150/100
+    FROM produit
+    WHERE NOMFOU < LIBART
+);
+
+
+/*16. Éditer la liste des fournisseurs susceptibles de livrer les produit dont
+le stock est inférieur ou égal à 150 % du stock d'alerte et un délai de
+livraison d'au plus 30 jours. La liste est triée par fournisseur puis
+produit */
+
+SELECT DISTINCT NOMFOU ,LIBART
+FROM fournis
+JOIN vente ON fournis.numfou = vente.numfou
+JOIN produit ON vente.CODART = produit.CODART
+WHERE STKPHY <= ( 
+    SELECT SUM(STKALE)*150/100
+    FROM produit
+    WHERE NOMFOU < LIBART AND DELLIV < 31
+);
+
+/*17. Avec le même type de sélection que ci-dessus, sortir un total des
+stocks par fournisseur trié par total décroissant */
+
+SELECT DISTINCT SUM(stkphy), nomfou 
+FROM fournis
+JOIN vente ON fournis.numfou = vente.numfou
+JOIN produit ON vente.CODART = produit.CODART
+GROUP BY NOMFOU
+ORDER BY sum(STKPHY) DESC;
+
+/*18. En fin d'année, sortir la liste des produits dont la quantité réellement
+commandée dépasse 90% de la quantité annuelle prévue. */
+
+SELECT QTEANN , LIBART
+FROM produit
+JOIN vente ON  vente.CODART = produit.CODART
+WHERE QTEANN > (
+    SELECT SUM((QTE1 + QTE2 + QTE3)*0.9)
+    FROM vente
+);
+
+/*19. Calculer le chiffre d'affaire par fournisseur pour l'année 93 sachant
+que les prix indiqués sont hors taxes et que le taux de TVA est 20%. */
+
+SELECT (((prix1*qte1) + (prix2*qte2) + (prix3*qte3))*1.2) AS chiffre_affaire, nomfou , datecom
+FROM vente 
+JOIN fournis ON vente.numfou = fournis.numfou
+JOIN entcom ON entcom.numfou = fournis.numfou
+WHERE datecom LIKE '2007%'
+GROUP BY nomfou;
+
+/*20. Existe-t-il des lignes de commande non cohérentes avec les produits
+vendus par les fournisseurs. ? */
+
+-- Oui la derniere , aucune commande en 1993 

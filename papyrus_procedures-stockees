@@ -60,7 +60,7 @@ DELIMITER |
 
 CREATE PROCEDURE ca_fournisseur()
 BEGIN 
-    SELECT (((prix1*qte1) + (prix2*qte2) + (prix3*qte3))*1.2) AS chiffre_affaire, nomfou , datecom
+    SELECT fournis.numfou , (((prix1*qte1) + (prix2*qte2) + (prix3*qte3))*1.2) AS chiffre_affaire, nomfou , datecom
 FROM vente 
 JOIN fournis ON vente.numfou = fournis.numfou
 JOIN entcom ON entcom.numfou = fournis.numfou

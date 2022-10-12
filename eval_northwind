@@ -17,3 +17,35 @@ WHERE Country ='France'
 GROUP BY fournisseur
 ORDER BY COUNT(*) DESC
 ;
+
+-- 4 - Liste des clients Français ayant plus de 10 commandes :
+
+SELECT CompanyName, COUNT(*) AS nombre_commandes
+    FROM customers
+    JOIN orders ON customers.CustomerID = orders.CustomerID
+    --JOIN `order details` ON orders.OrderID = `order details`.OrderID
+    WHERE customers.Country = "France" 
+    GROUP BY CompanyName
+    HAVING COUNT(*) > 10
+    ;
+
+-- 5 - Liste des clients ayant un chiffre d’affaires > 30.000 :
+
+SELECT CompanyName AS "clients", SUM(`order details`.unitPrice * `order details`.Quantity) AS CA, Country as "Country"
+    FROM customers
+    JOIN orders ON customers.CustomerID = orders.CustomerID
+    JOIN `order details` ON orders.OrderID = `order details`.OrderID 
+    GROUP BY CompanyName 
+    HAVING CA > 30000
+    ORDER BY CA DESC
+    ;
+
+-- 6 – Liste des pays dont les clients ont passé commande de produits fournis par « Exotic Liquids » :
+
+SELECT Country AS pays ,COUNT(CompanyName) FROM products 
+    JOIN suppliers ON products.SupplierID = suppliers.SupplierID
+    WHERE CompanyName = 'Exotic Liquids' 
+    GROUP BY pays
+    ;
+
+    

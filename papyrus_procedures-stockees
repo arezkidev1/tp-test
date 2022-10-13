@@ -96,3 +96,4 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS ca_fournisseur;
 
 call ca_fournisseur(2007);
+

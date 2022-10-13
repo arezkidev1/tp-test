@@ -54,9 +54,9 @@ calcule et restitue le CA potentiel de ce fournisseur pour l'année souhaitée (
 On exécutera la requête que si le code fournisseur est valide, c'est-à-dire dans la table FOURNIS.
 Testez cette procédure avec différentes valeurs des paramètres. */
 
-DROP PROCEDURE ca_fournisseur ;
+DROP PROCEDURE IF EXISTS ca_fournisseur ;
 
-DELIMITER |
+/*DELIMITER |
 
 CREATE PROCEDURE ca_fournisseur()
 BEGIN 
@@ -68,8 +68,31 @@ WHERE datecom LIKE '2007%'
 GROUP BY nomfou;
 END |
 
-DELIMITER;
+DELIMITER; */
 
 SHOW CREATE PROCEDURE ca_fournisseur ;
 
 SHOW PROCEDURE STATUS;
+
+             ---------
+
+
+DELIMITER |
+CREATE PROCEDURE ca_fournisseur(IN annee INT)
+BEGIN
+SELECT f.nomfou, (SUM(qtecde * prix1) * 1.2) as 'Prix TTC'
+FROM fournis f
+JOIN vente v ON f.numfou = v.numfou
+JOIN produit p ON v.codart = .p.codart
+JOIN ligcom l ON p.codart = l.codart
+JOIN entcom e ON l.numcom = e.numcom
+WHERE YEAR(e.datecom) = annee
+GROUP BY nomfou;
+
+END |
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS ca_fournisseur;
+
+call ca_fournisseur(2007);

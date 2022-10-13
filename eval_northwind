@@ -1,6 +1,9 @@
 -- Active: 1665131827383@@127.0.0.1@3306@northwind
 
 
+-------------------------------------1) Requêtes d'intérrogation sur la base NorthWind ----------------------------------
+
+
 --1 - Liste des contacts français :
 select CompanyName societe, ContactName contact, ContactTitle fonction, Phone telephone From customers 
 WHERE Country = 'France';
@@ -88,3 +91,4 @@ SELECT ROUND(AVG(DATEDIFF(ShippedDate,OrderDate))) AS 'Delai moyen de livraison'
     FROM orders;
 
 
+-----------------------------------2) Procédures stockées ---------------------------------------

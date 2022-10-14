@@ -1,4 +1,4 @@
--- Active: 1664351913126@@127.0.0.1@3306@papyrus2
+-- Active: 1665131827383@@127.0.0.1@3306@papyrus
 
 
 create table article_a_commander (

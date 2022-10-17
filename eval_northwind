@@ -45,12 +45,7 @@ SELECT CompanyName AS "clients", SUM(`order details`.unitPrice * `order details`
 
 -- 6 – Liste des pays dont les clients ont passé commande de produits fournis par « Exotic Liquids » :
 
-/*SELECT Country AS pays , COUNT(CompanyName)
-FROM products 
-JOIN suppliers ON products.SupplierID = suppliers.SupplierID
-WHERE CompanyName = 'Exotic Liquids' 
-GROUP BY pays ASC
-; */
+
 
     SELECT customers.Country AS Pays
 FROM customers
@@ -98,7 +93,6 @@ SELECT ROUND(AVG(DATEDIFF(ShippedDate,OrderDate))) AS 'Delai moyen de livraison'
 -- Les procédures stockées doivent prendre en compte les éventuels paramètres.
 
 
-
 -- Requete 9
 
 
@@ -123,8 +117,8 @@ SHOW CREATE PROCEDURE Derniere_commande;
 
 CALL Derniere_commande;
 
-
 -- Requete 10
+
 
 DROP PROCEDURE Delai_moyen_livraison;
 
@@ -138,7 +132,6 @@ BEGIN
 
 END |
 
-
 DELIMITER ;
 
 SHOW CREATE PROCEDURE Delai_moyen_livraison;
@@ -149,12 +142,11 @@ CALL Delai_moyen_livraison;
 /*  3) Mise en place d'une règle de gestion
 
 L'entreprise souhaite mettre en place cette règle de gestion:
-
 Pour tenir compte des coûts liés au transport, on vérifiera que pour chaque produit d’une commande, le client réside dans le même pays que le fournisseur du même produit
-
 Il s'agit d'interdire l'insertion de produits dans les commandes ne satisfaisants pas à ce critère.
-
 Décrivez par quel moyen et avec quels outils (procédures stockées, trigger...) vous pourriez implémenter la règle de gestion suivante. */
+
+DROP TRIGGER customers_suppliers_country;
 
 
 DELIMITER |
@@ -183,7 +175,28 @@ BEGIN
 	END | 
 DELIMITER ;
 
-DROP TRIGGER customers_suppliers_country;
+
+
+-- test
+
+SELECT suppliers.Country
+	    FROM
+	        `order details`
+	        JOIN orders ON orders.OrderID = `order details`.OrderID
+	        JOIN products ON `order details`.ProductID = products.ProductID
+	        JOIN suppliers ON products.SupplierID = suppliers.SupplierID
+	    WHERE
+	        orders.OrderID = 10248 AND products.ProductID = 11;
+
+SELECT DISTINCT orders.ShipCountry
+	    FROM `order details`
+        JOIN orders ON `order details`.OrderID = orders.OrderID
+        WHERE orders.OrderID = 10248;
+
+INSERT INTO `order details`(OrderID, ProductID, UnitPrice, Quantity, Discount)
+VALUES (10248, 35, 12.0000, 1, 0);
+
+
 
 
 

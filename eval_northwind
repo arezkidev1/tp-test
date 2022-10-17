@@ -97,9 +97,13 @@ SELECT ROUND(AVG(DATEDIFF(ShippedDate,OrderDate))) AS 'Delai moyen de livraison'
 -- Codez deux procédures stockées correspondant aux requêtes 9 et 10. 
 -- Les procédures stockées doivent prendre en compte les éventuels paramètres.
 
+
+
 -- Requete 9
 
+
 DROP PROCEDURE Derniere_commande;
+
 DELIMITER |
 
 CREATE PROCEDURE Derniere_commande()
@@ -119,22 +123,67 @@ SHOW CREATE PROCEDURE Derniere_commande;
 
 CALL Derniere_commande;
 
--- Requete 10
 
+-- Requete 10
 
 DROP PROCEDURE Delai_moyen_livraison;
 
-CREATE PROCEDURE Delai_moyen_livraison()
-
 DELIMITER |
+
+CREATE PROCEDURE Delai_moyen_livraison()
 
 BEGIN
     SELECT ROUND(AVG(DATEDIFF(ShippedDate,OrderDate))) AS 'Delai moyen de livraison'
     FROM orders;
+
 END |
 
-DELIMITER;
+
+DELIMITER ;
 
 SHOW CREATE PROCEDURE Delai_moyen_livraison;
 
 CALL Delai_moyen_livraison;
+
+
+/*  3) Mise en place d'une règle de gestion
+
+L'entreprise souhaite mettre en place cette règle de gestion:
+
+Pour tenir compte des coûts liés au transport, on vérifiera que pour chaque produit d’une commande, le client réside dans le même pays que le fournisseur du même produit
+
+Il s'agit d'interdire l'insertion de produits dans les commandes ne satisfaisants pas à ce critère.
+
+Décrivez par quel moyen et avec quels outils (procédures stockées, trigger...) vous pourriez implémenter la règle de gestion suivante. */
+
+
+DELIMITER |
+
+CREATE TRIGGER customers_suppliers_country AFTER INSERT 
+ON `order details` 
+FOR EACH ROW 
+BEGIN 
+	IF (
+	    SELECT DISTINCT orders.ShipCountry
+	    FROM `order details`
+        JOIN orders ON `order details`.OrderID = orders.OrderID
+        WHERE orders.OrderID = NEW.OrderID
+	) != (
+	    SELECT suppliers.Country
+	    FROM
+	        `order details`
+	        JOIN orders ON orders.OrderID = `order details`.OrderID
+	        JOIN products ON `order details`.ProductID = products.ProductID
+	        JOIN suppliers ON products.SupplierID = suppliers.SupplierID
+	    WHERE
+	        orders.OrderID = NEW.OrderID AND products.ProductId = NEW.ProductID
+	) THEN 
+	SIGNAL SQLSTATE '40000' SET MESSAGE_TEXT = "Il y a au moins 1 produit qui ne provient pas d'un pays étranger";
+	END IF;
+	END | 
+DELIMITER ;
+
+DROP TRIGGER customers_suppliers_country;
+
+
+
